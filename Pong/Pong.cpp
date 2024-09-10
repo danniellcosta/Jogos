@@ -1,18 +1,10 @@
 #include "raylib.h"
 #include <cmath>
 
-//------------------------------------------------------------------------------------------
-// Types and Structures Definition
-//------------------------------------------------------------------------------------------
 typedef enum GameScreen { LOGO = 0, TITLE, GAMEPLAY, ENDING } GameScreen;
 
-//------------------------------------------------------------------------------------
-// Program main entry point
-//------------------------------------------------------------------------------------
 int main(void)
 {
-    // Initialization
-    //--------------------------------------------------------------------------------------
     const int screenWidth = 800;
     const int screenHeight = 450;
 
@@ -21,34 +13,29 @@ int main(void)
 
     GameScreen currentScreen = LOGO;
 
-    // Player retângulos
-    int playerY = screenHeight / 2 - 60; // Iniciar no meio da tela (jogador esquerdo)
-    int playerHeight = 110;              // Altura dos retângulos
-    int playerWidth = 20;                // Largura dos retângulos
+    int playerY = screenHeight / 2 - 60;
+    int playerHeight = 110;
+    int playerWidth = 20;
 
-    // Computador retângulo
-    int computerY = screenHeight / 2 - playerHeight / 2; // Iniciar no meio da tela (jogador direito)
-    float computerBaseSpeed = 4.0f; // Velocidade base do retângulo do computador
-    float computerMaxSpeed = 8.0f; // Velocidade máxima do computador
+    int computerY = screenHeight / 2 - playerHeight / 2; 
+    float computerBaseSpeed = 4.0f;
+    float computerMaxSpeed = 8.0f;
 
-    // Bola
     Vector2 ballPosition = { GetScreenWidth()/2.0f, GetScreenHeight()/2.0f };
     Vector2 ballSpeed = { 4.0f, 4.0f };
     int ballRadius = 10;
-    float speedIncreaseFactor = 1.1f; // Fator de aumento de velocidade a cada colisão
+    float speedIncreaseFactor = 1.1f;
     
-    bool pause = true;  // Inicia com o jogo pausado
+    bool pause = true;
     bool gameStarted = false;
     
-    int playerScore = 0; // Initialize player score to 0
-    int computerScore = 0; // Initialize computer score to 0
+    int playerScore = 0;
+    int computerScore = 0;
 
-    int framesCounter = 0; // Contador de frames
+    int framesCounter = 0;
 
-    SetTargetFPS(60); // Set desired framerate (frames-per-second)
-    //--------------------------------------------------------------------------------------
-
-    // Função para resetar o jogo
+    SetTargetFPS(60);
+ 
     auto ResetGame = [&]() {
         ballPosition = { GetScreenWidth()/2.0f, GetScreenHeight()/2.0f };
         ballSpeed = { 4.0f, 4.0f };
@@ -58,70 +45,57 @@ int main(void)
         gameStarted = false;
     };
 
-    // Main game loop
-    while (!WindowShouldClose()) // Detect window close button ou ESC key
+    while (!WindowShouldClose()
     {
         if (IsKeyPressed(KEY_SPACE)) pause = !pause;
 
         if (!pause) {
-            // Movimentação da bola
             ballPosition.x += ballSpeed.x;
             ballPosition.y += ballSpeed.y;
 
-            // Limitar a velocidade máxima da bola
             if (fabs(ballSpeed.x) > 9.5f) ballSpeed.x = copysign(9.5f, ballSpeed.x);
             if (fabs(ballSpeed.y) > 9.5f) ballSpeed.y = copysign(9.5f, ballSpeed.y);
 
-            // Verifica colisão com as bordas superiores e inferiores
             if ((ballPosition.y >= (GetScreenHeight() - ballRadius)) || (ballPosition.y <= ballRadius)) 
                 ballSpeed.y *= -1.0f;
 
-            // Movimento do jogador esquerdo (usando o mouse)
             playerY = GetMouseY() - playerHeight / 2;
             if (playerY < 0) playerY = 0;
             if (playerY > screenHeight - playerHeight) playerY = screenHeight - playerHeight;
 
-            // Movimento do computador (segue a bola adaptando a velocidade)
-            float distanceToBall = ballPosition.y - (computerY + playerHeight / 2); // Distância da bola ao centro do retângulo do computador
+            float distanceToBall = ballPosition.y - (computerY + playerHeight / 2); 
 
-            // Velocidade adaptada
             float adaptiveSpeed = computerBaseSpeed + (computerMaxSpeed - computerBaseSpeed) * (fabsf(distanceToBall) / screenHeight);
 
-            // Adicionar variação aleatória na movimentação do computador para simular erros
-            float randomError = GetRandomValue(-10, 10) * 0.03f; // Variação aleatória para simular erro
+            float randomError = GetRandomValue(-10, 10) * 0.03f;
             adaptiveSpeed += randomError;
 
-            // Movimento do computador com a velocidade adaptada
             if (distanceToBall > 0) {
-                computerY += adaptiveSpeed; // Move para baixo
+                computerY += adaptiveSpeed;
             } 
             else if (distanceToBall < 0) {
-                computerY -= adaptiveSpeed; // Move para cima
+                computerY -= adaptiveSpeed;
             }
 
-            // Impede que o computador saia dos limites da tela
             if (computerY < 0) computerY = 0;
             if (computerY > screenHeight - playerHeight) computerY = screenHeight - playerHeight;
 
-            // Verificar colisão da bola com o retângulo esquerdo (player)
             if (ballPosition.x - ballRadius <= 50 + playerWidth && 
                 ballPosition.y + ballRadius >= playerY && ballPosition.y - ballRadius <= playerY + playerHeight) {
-                ballSpeed.x *= -1.0f; // Inverter a direção horizontal da bola
-                ballSpeed.x *= speedIncreaseFactor; // Aumentar a velocidade no eixo X
-                ballSpeed.y *= speedIncreaseFactor; // Aumentar a velocidade no eixo Y
-                ballPosition.x = 50 + playerWidth + ballRadius; // Evitar "grudar" na borda
+                ballSpeed.x *= -1.0f;
+                ballSpeed.x *= speedIncreaseFactor;
+                ballSpeed.y *= speedIncreaseFactor;
+                ballPosition.x = 50 + playerWidth + ballRadius;
             }
 
-            // Verificar colisão da bola com o retângulo direito (computador)
             if (ballPosition.x + ballRadius >= 725 && 
                 ballPosition.y + ballRadius >= computerY && ballPosition.y - ballRadius <= computerY + playerHeight) {
-                ballSpeed.x *= -1.0f; // Inverter a direção horizontal da bola
-                ballSpeed.x *= speedIncreaseFactor; // Aumentar a velocidade no eixo X
-                ballSpeed.y *= speedIncreaseFactor; // Aumentar a velocidade no eixo Y
-                ballPosition.x = 725 - ballRadius; // Evitar "grudar" na borda
+                ballSpeed.x *= -1.0f;
+                ballSpeed.x *= speedIncreaseFactor;
+                ballSpeed.y *= speedIncreaseFactor;
+                ballPosition.x = 725 - ballRadius;
             }
 
-            // Atualizar pontuação
             if (ballPosition.x < 0) {
                 computerScore++;
                 ballPosition = { screenWidth/2.0f, screenHeight/2.0f };
@@ -134,7 +108,6 @@ int main(void)
             }
         }
 
-        // Update
         switch (currentScreen) {
             case LOGO: {
                 framesCounter++;
@@ -157,11 +130,10 @@ int main(void)
 
             case ENDING: {
                 if (IsKeyPressed(KEY_ENTER) || IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                    ResetGame(); // Resetar o jogo ao final da tela de ENDING
-                    currentScreen = GAMEPLAY; // Voltar para a tela de gameplay
+                    ResetGame();
+                    currentScreen = GAMEPLAY;
                 }
 
-                // Desenhar o texto de fim de jogo
                 if (playerScore == 10) {
                     DrawText("Você venceu!", screenWidth / 2 - 100, screenHeight / 2 - 20, 40, GREEN);
                 } else {
@@ -172,7 +144,6 @@ int main(void)
             default: break;
         }
 
-        // Draw
         BeginDrawing();
         ClearBackground(BLACK);
 
@@ -192,15 +163,13 @@ int main(void)
                 DrawText(TextFormat("Player Score: %d", playerScore), 10, 10, 20, WHITE);
                 DrawText(TextFormat("Computer Score: %d", computerScore), 570, 10, 24, WHITE);
 
-                // Desenha os retângulos dos jogadores e a bola
                 DrawRectangle(50, playerY, playerWidth, playerHeight, WHITE);
                 DrawRectangle(725, computerY, playerWidth, playerHeight, WHITE);
-                DrawCircleV(ballPosition, (float)ballRadius, WHITE); // Bola desenhada
+                DrawCircleV(ballPosition, (float)ballRadius, WHITE);
 
-                 // Exibe o texto PAUSED se o jogo estiver pausado
     if (pause) {
         if ((framesCounter / 30) % 2 == 0) {
-            DrawText("PAUSED", 350, 200, 30, GRAY); // Desenha o texto "PAUSED"
+            DrawText("PAUSED", 350, 200, 30, GRAY);
             DrawText("APERTE ESPACO para DESPAUSAR",320,240,10,GRAY);
         }
     }
