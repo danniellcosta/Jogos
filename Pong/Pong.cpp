@@ -32,6 +32,9 @@ int main(void)
     
     int playerScore = 0; 
     int computerScore = 0;
+    
+    int letterCount = 0;
+    int state = 0;
 
     int framesCounter = 0;
     
@@ -51,6 +54,9 @@ int main(void)
 
     while (!WindowShouldClose())
     {
+        
+       
+        
         if (IsKeyPressed(KEY_SPACE)) pause = !pause;
 
         if (!pause) {
@@ -119,10 +125,35 @@ int main(void)
 
         switch (currentScreen) {
             case LOGO: {
-                framesCounter++;
+               
+
+               
+                 if (state == 0)                 
+        {
+
+           framesCounter++;
+
+            if (framesCounter/12)       
+            {
+                letterCount++;
+                framesCounter = 0;
+                
+                 if (letterCount > 8) {
+                   state = 1;
+                }
+                             
+                
+            }
+            
+        }else if(state == 1){
+                 
+                 framesCounter++;
                 if (framesCounter > 120) {
                     currentScreen = TITLE;
                 }
+         
+        }
+
             } break;
 
             case TITLE: {
@@ -158,8 +189,7 @@ int main(void)
 
         switch (currentScreen) {
             case LOGO: {
-                DrawText("Bem Vindo!", 20, 20, 40, LIGHTGRAY);
-                DrawText("ESPERE por 2 SEGUNDOS...", 290, 220, 20, GRAY);
+                 DrawText(TextSubtext("Pong Game", 0, letterCount), GetScreenWidth()/2 -120, GetScreenHeight()/2 -40, 50, WHITE);
             } break;
 
             case TITLE: {
