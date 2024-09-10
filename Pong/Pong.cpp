@@ -46,8 +46,8 @@ int main(void)
 
     int framesCounter = 0; // Contador de frames
     
-    Sound ballSom = LoadSound("ball.wav");
-    Sound pontoSom = LoadSound("ponto.wav");
+    Sound ballSom = LoadSound("ballHit.wav");
+    Sound pontoSom = LoadSound("ponto.mp3");
     
     SetTargetFPS(60); // Set desired framerate (frames-per-second)
     //--------------------------------------------------------------------------------------
