@@ -199,8 +199,9 @@ int main(void)
             } break;
 
             case GAMEPLAY: {
-                DrawText(TextFormat("Player Score: %d", playerScore), 10, 10, 20, WHITE);
-                DrawText(TextFormat("Computer Score: %d", computerScore), 570, 10, 24, WHITE);
+                DrawText(TextFormat("%d", playerScore), 280, 10, 50, WHITE);
+                DrawText(" X ", screenWidth/2 - 40,10,50,WHITE);
+                DrawText(TextFormat("%d", computerScore),500, 10, 50, WHITE);
 
                 DrawRectangle(50, playerY, playerWidth, playerHeight, WHITE);
                 DrawRectangle(725, computerY, playerWidth, playerHeight, WHITE);
