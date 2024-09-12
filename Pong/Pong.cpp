@@ -91,22 +91,55 @@ int main(void)
             if (computerY < 0) computerY = 0;
             if (computerY > screenHeight - playerHeight) computerY = screenHeight - playerHeight;
 
-            if (ballPosition.x - ballRadius <= 50 + playerWidth && 
-                ballPosition.y + ballRadius >= playerY && ballPosition.y - ballRadius <= playerY + playerHeight) {
-                PlaySound(ballSom);
-                ballSpeed.x *= -1.0f;
-                ballSpeed.x *= speedIncreaseFactor;
-                ballSpeed.y *= speedIncreaseFactor;
-                ballPosition.x = 50 + playerWidth + ballRadius;
+            if (ballSpeed.x < 0 && 
+            ballPosition.x - ballRadius <= 50 + playerWidth && 
+            ballPosition.x - ballRadius > 50 && 
+            ballPosition.y + ballRadius >= playerY && 
+            ballPosition.y - ballRadius <= playerY + playerHeight) {
+                
+                    if (ballPosition.x - ballRadius <= 50 + playerWidth) {
+                        PlaySound(ballSom);
+                        ballSpeed.x *= -1.0f; 
+                        ballSpeed.x *= speedIncreaseFactor;
+                        ballSpeed.y *= speedIncreaseFactor;
+                        ballPosition.x = 50 + playerWidth + ballRadius;
+                    }else if (ballPosition.y - ballRadius <= playerY) {
+                        PlaySound(ballSom); 
+                        ballSpeed.y *= -1.0f; 
+                        ballPosition.y = playerY - ballRadius; 
+                    }else if (ballPosition.y + ballRadius >= playerY + playerHeight) {
+                        PlaySound(ballSom);
+                        ballSpeed.y *= -1.0f; 
+                        ballPosition.y = playerY + playerHeight + ballRadius; 
+                    }
             }
 
-            if (ballPosition.x + ballRadius >= 725 && 
-                ballPosition.y + ballRadius >= computerY && ballPosition.y - ballRadius <= computerY + playerHeight) {
-                PlaySound(ballSom);
-                ballSpeed.x *= -1.0f;
-                ballSpeed.x *= speedIncreaseFactor; 
-                ballSpeed.y *= speedIncreaseFactor; 
-                ballPosition.x = 725 - ballRadius; 
+
+            if (ballSpeed.x > 0 && 
+                ballPosition.x + ballRadius >= 725 && 
+                ballPosition.x - ballRadius < 725 + (ballSpeed.x > 0 ? 0 : -ballSpeed.x) &&  
+                ballPosition.y + ballRadius >= computerY && 
+                ballPosition.y - ballRadius <= computerY + playerHeight) { 
+
+                if (ballPosition.x + ballRadius >= 725) {
+                    PlaySound(ballSom); 
+                    ballSpeed.x *= -1.0f; 
+                    ballSpeed.x *= speedIncreaseFactor;
+                    ballSpeed.y *= speedIncreaseFactor;
+                    ballPosition.x = 725 - ballRadius;
+                }
+               
+                else if (ballPosition.y - ballRadius <= computerY) {
+                    PlaySound(ballSom); 
+                    ballSpeed.y *= -1.0f; 
+                    ballPosition.y = computerY - ballRadius;
+                }
+              
+                else if (ballPosition.y + ballRadius >= computerY + playerHeight) {
+                    PlaySound(ballSom); 
+                    ballSpeed.y *= -1.0f; 
+                    ballPosition.y = computerY + playerHeight + ballRadius;
+                }
             }
 
             if (ballPosition.x < 0) {
@@ -176,7 +209,7 @@ int main(void)
 
                 if (playerScore == 10) {
                     DrawText("Você venceu!", screenWidth / 2 - 100, screenHeight / 2 - 20, 40, GREEN);
-                } else {
+                } else if (computerScore == 10) {
                     DrawText("Você perdeu!", screenWidth / 2 - 100, screenHeight / 2 - 20, 40, RED);
                 }
             } break;
@@ -217,6 +250,7 @@ int main(void)
 
             case ENDING: {
                 gameStarted = false;
+                pause = true;
                 DrawRectangle(0, 0, screenWidth, screenHeight, BLACK);
                 if (playerScore == 10) {
                     DrawText("Você Venceu!!", 20, 20, 40, WHITE);
